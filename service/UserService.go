@@ -1,30 +1,58 @@
 package service
-import(
-	"net/http"
+
+import (
 	"api/pojo"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
-var  commentList =[]string{"123","456"}
-//get all 
-func FindAllComment(ctx *gin.Context){
-	// ctx.JSON(http.StatusOK,commentList)
+
+//get all
+func FindAllComment(ctx *gin.Context) {
+	commentList := pojo.FindAllComment()
+
+	ctx.JSON(http.StatusOK, commentList)
 
 }
-func GetUserById(ctx *gin.Context){
-	 comment  := pojo.FindCommentId(ctx.Param("id")) 
-	if  comment. Id == 0 {
-		ctx.JSON(http.StatusNotFound,"ERROR")
+
+func GetCommentByTeacher(ctx *gin.Context) {
+
+	question := ctx.DefaultQuery("q", "")
+	if question == "" {
+		ctx.JSON(http.StatusNotFound, "NOT FOUND")
 		return
-    }
-	 
-	ctx.JSON(http.StatusOK,comment)
+	}
+	comment := pojo.FindCommentByQuestion(question)
+	if comment == nil {
+		ctx.JSON(http.StatusNotFound, "NOT FOUND")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, comment)
 }
-func POSTAllComment(ctx *gin.Context){
-	Page := pojo.Page{	}
-	err := ctx.BindJSON(&Page)
-	if err== nil{
-	    ctx.JSON(http.StatusNotAcceptable,err);
-			       return
-    }
-	ctx.JSON(http.StatusOK,"Page post success")
+
+func GetCommentById(ctx *gin.Context) {
+
+	question := ctx.DefaultQuery("id", "")
+	if question == "" {
+		ctx.JSON(http.StatusNotFound, "NOT FOUND")
+		return
+	}
+	comment := pojo.FindCommentById(question)
+	if comment.Id == 0 {
+		ctx.JSON(http.StatusNotFound, "NOT FOUND")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, comment)
 }
+
+// func POSTAllComment(ctx *gin.Context) {
+// 	Page := pojo.Page{}
+// 	err := ctx.BindJSON(&Page)
+// 	if err == nil {
+// 		ctx.JSON(http.StatusNotAcceptable, err)
+// 		return
+// 	}
+// 	ctx.JSON(http.StatusOK, "Page post success")
+// }
