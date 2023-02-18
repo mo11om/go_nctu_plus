@@ -54,9 +54,9 @@ func FindCommentById(id string) Comment {
 
 	return c
 }
-func FindAllComment() []Comment {
+func FindAllComment() []SendInformation {
 	var c []Comment
 	database.Db.Raw("select * from discusses ;").Scan(&c)
 
-	return c
+	return get_sendinformtion(c)
 }
