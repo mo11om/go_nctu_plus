@@ -47,6 +47,10 @@ func GetCommentById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, comment)
 }
 
+
+
+
+
 // func POSTAllComment(ctx *gin.Context) {
 // 	Page := pojo.Page{}
 // 	err := ctx.BindJSON(&Page)
