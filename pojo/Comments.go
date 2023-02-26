@@ -11,9 +11,9 @@ import (
 // }
 
 type Comment struct {
-	Id                  int       `json:"id"`
-	UserId              int       `json:"user_id"`
-	Courseteachershipid int       `gorm:"column:course_teachership_id"  json:"courseteachershipid"`
+	Id                  int       `json:"-"`
+	UserId              int       `json:"-"`
+	Courseteachershipid int       `gorm:"column:course_teachership_id"  json:"-"`
 	Content             string    `gorm:"content" json:"Content" `
 	Is_anonymous        bool      `gorm:"is_anonymous" json:"is_anonymous"`
 	Title               string    `gorm:"title" json:"title"`
