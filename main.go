@@ -1,11 +1,10 @@
 package main
 
 import (
-	 
-
-    _"github.com/joho/godotenv/autoload"
-	// "api/database"
+	"api/database"
 	. "api/src"
+
+	_ "github.com/joho/godotenv/autoload"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,8 +15,8 @@ func main() {
 	AddCommentRouter(v1)
 	AddOauthrouter(v1)
 
-	// go func() {
-	// 	database.DBconnect()
-	// }()
+	go func() {
+		database.DBconnect()
+	}()
 	router.Run("localhost:8080")
 }

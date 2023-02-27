@@ -11,7 +11,7 @@ import (
 // }
 
 type Comment struct {
-	Id                  int       `json:"-"`
+	Id                  int       `json:"id"`
 	UserId              int       `json:"-"`
 	Courseteachershipid int       `gorm:"column:course_teachership_id"  json:"-"`
 	Content             string    `gorm:"content" json:"Content" `
@@ -38,13 +38,13 @@ func get_sendinformtion(c []Comment) []SendInformation {
 	}
 	return send
 }
-func FindCommentByQuestion(question string) []SendInformation {
+func FindCommentByQuestion(question string) []Comment {
 	var c []Comment
 	// var send []SendInformation
 	database.Db.Raw("select * from discusses where course_teachership_id in (select id    from course_teacherships  where(  INSTR( teacher_id ,(select id from teachers where name =?)  ) > 0));",
 		question).Scan(&c)
 
-	return get_sendinformtion(c)
+	return c
 }
 
 func FindCommentById(id string) Comment {
@@ -54,9 +54,9 @@ func FindCommentById(id string) Comment {
 
 	return c
 }
-func FindAllComment() []SendInformation {
+func FindAllComment() []Comment {
 	var c []Comment
 	database.Db.Raw("select * from discusses ;").Scan(&c)
 
-	return get_sendinformtion(c)
+	return c
 }
