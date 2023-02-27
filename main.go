@@ -2,6 +2,7 @@ package main
 
 import (
 	"api/database"
+	"api/middleware"
 	. "api/src"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -11,6 +12,7 @@ import (
 
 func main() {
 	router := gin.Default()
+	router.Use(middleware.Cors())
 	v1 := router.Group("api/v1")
 	AddCommentRouter(v1)
 	AddOauthrouter(v1)
