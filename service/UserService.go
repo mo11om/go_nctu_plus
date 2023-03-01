@@ -19,7 +19,7 @@ func GetCommentByTeacher(ctx *gin.Context) {
 
 	question := ctx.DefaultQuery("q", "")
 	if question == "" {
-		ctx.JSON(http.StatusNotFound, "NOT FOUND")
+		ctx.JSON(http.StatusNotFound, "")
 		return
 	}
 	comment := pojo.FindCommentByQuestion(question)
