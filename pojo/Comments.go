@@ -22,7 +22,7 @@ type Comment struct {
 	Created_at          time.Time `gorm:"created_at" json:"created_at"`
 }
 type Teachers struct {
-	Name		string `gorm:"name" json`	
+	Name		string `gorm:"name" json "name"`	
 	real_id		string `gorm:"real_id" json:"real_id"`	
 	Is_deleted 	bool `gorm:"is_deleted" json:"is_deleted"`		
 	Id			int	 	 `json:"id"`
@@ -31,7 +31,7 @@ type Teachers struct {
 
 }
 
-func FindCommentByTeacher(question string)  string {
+func FindTeacher(question string)   Teachers {
 	 
 	var teacher Teachers
 
@@ -39,8 +39,8 @@ func FindCommentByTeacher(question string)  string {
 	
 	database.Db.Raw("SELECT * FROM    teachers where (name =? );",
 	 question ).Scan(&teacher)
-	teacher_query :="[" +  strconv.Itoa(teacher.Id  )+"]"
-	return teacher_query
+	
+	return  teacher
 }
 
  
@@ -48,8 +48,8 @@ func FindCommentByQuestion(question string) []Comment {
 	var c []Comment
 	// var send []Comment
 	
-	teacher_query := FindCommentByTeacher (question)
-
+	teacher := FindTeacher (question)
+	teacher_query :="[" +  strconv.Itoa(teacher.Id  )+"]"
 	database.Db.Raw("select * from discusses where course_teachership_id in (select id from course_teacherships where  course_teacherships .teacher_id  =  ?);",
 	teacher_query ).Scan(&c)
 
