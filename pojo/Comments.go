@@ -3,6 +3,7 @@ package pojo
 import (
 	"api/database"
 	"time"
+	"strconv"
 )
 
 // type Page struct{
@@ -20,29 +21,37 @@ type Comment struct {
 	Updated_at          time.Time `gorm:"updated_at" json:"updated_at"`
 	Created_at          time.Time `gorm:"created_at" json:"created_at"`
 }
+type Teachers struct {
+	Name		string `gorm:"name" json`	
+	real_id		string `gorm:"real_id" json:"real_id"`	
+	Is_deleted 	bool `gorm:"is_deleted" json:"is_deleted"`		
+	Id			int	 	 `json:"id"`
+	Updated_at	time.Time `gorm:"updated_at" json:"updated_at"`
+	Created_at	time.Time `gorm:"created_at" json:"created_at"`	
 
-type SendInformation struct {
-	Content      string    `gorm:"content" json:"Content" `
-	Is_anonymous bool      `gorm:"is_anonymous" json:"is_anonymous"`
-	Title        string    `gorm:"title" json:"title"`
-	Updated_at   time.Time `gorm:"updated_at" json:"updated_at"`
-	Created_at   time.Time `gorm:"created_at" json:"created_at"`
 }
 
-func get_sendinformtion(c []Comment) []SendInformation {
+func FindCommentByTeacher(question string)  string {
+	 
+	var teacher Teachers
 
-	var send []SendInformation
-	for _, c2 := range c {
-
-		send = append(send, SendInformation{c2.Content, c2.Is_anonymous, c2.Title, c2.Created_at, c2.Updated_at})
-	}
-	return send
+	// var send []Comment
+	
+	database.Db.Raw("SELECT * FROM    teachers where (name =? );",
+	 question ).Scan(&teacher)
+	teacher_query :="[" +  strconv.Itoa(teacher.Id  )+"]"
+	return teacher_query
 }
+
+ 
 func FindCommentByQuestion(question string) []Comment {
 	var c []Comment
-	// var send []SendInformation
-	database.Db.Raw("select * from discusses where course_teachership_id in (select id    from course_teacherships  where(  INSTR( teacher_id ,(select id from teachers where name =?)  ) > 0));",
-		question).Scan(&c)
+	// var send []Comment
+	
+	teacher_query := FindCommentByTeacher (question)
+
+	database.Db.Raw("select * from discusses where course_teachership_id in (select id from course_teacherships where  course_teacherships .teacher_id  =  ?);",
+	teacher_query ).Scan(&c)
 
 	return c
 }
