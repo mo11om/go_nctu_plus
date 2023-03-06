@@ -1,9 +1,9 @@
-package pojo
+package controllers
 
 import (
 	"api/database"
-	"time"
 	"strconv"
+	"time"
 )
 
 // type Page struct{
@@ -22,36 +22,34 @@ type Comment struct {
 	Created_at          time.Time `gorm:"created_at" json:"created_at"`
 }
 type Teachers struct {
-	Name		string `gorm:"name" json "name"`	
-	real_id		string `gorm:"real_id" json:"real_id"`	
-	Is_deleted 	bool `gorm:"is_deleted" json:"is_deleted"`		
-	Id			int	 	 `json:"id"`
-	Updated_at	time.Time `gorm:"updated_at" json:"updated_at"`
-	Created_at	time.Time `gorm:"created_at" json:"created_at"`	
-
+	Name       string    `gorm:"name" json "name"`
+	real_id    string    `gorm:"real_id" json:"real_id"`
+	Is_deleted bool      `gorm:"is_deleted" json:"is_deleted"`
+	Id         int       `json:"id"`
+	Updated_at time.Time `gorm:"updated_at" json:"updated_at"`
+	Created_at time.Time `gorm:"created_at" json:"created_at"`
 }
 
-func FindTeacher(question string)   Teachers {
-	 
+func FindTeacher(question string) Teachers {
+
 	var teacher Teachers
 
 	// var send []Comment
-	
+
 	database.Db.Raw("SELECT * FROM    teachers where (name =? );",
-	 question ).Scan(&teacher)
-	
-	return  teacher
+		question).Scan(&teacher)
+
+	return teacher
 }
 
- 
 func FindCommentByQuestion(question string) []Comment {
 	var c []Comment
 	// var send []Comment
-	
-	teacher := FindTeacher (question)
-	teacher_query :="[" +  strconv.Itoa(teacher.Id  )+"]"
+
+	teacher := FindTeacher(question)
+	teacher_query := "[" + strconv.Itoa(teacher.Id) + "]"
 	database.Db.Raw("select * from discusses where course_teachership_id in (select id from course_teacherships where  course_teacherships .teacher_id  =  ?);",
-	teacher_query ).Scan(&c)
+		teacher_query).Scan(&c)
 
 	return c
 }

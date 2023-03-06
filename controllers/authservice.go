@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 var redirect_uri string = os.Getenv("redirect_uri")
@@ -33,10 +34,14 @@ type profileResponse struct {
 func Get_login_uri() string {
 
 	var login_uri string = auth_server_url + "/o/authorize/?" + "client_id=" + client_id + "&response_type=code&scope=profile&redirect_uri=" + redirect_uri + "/api/v1/oauth/code"
+	println("auth_server_url", auth_server_url)
+	println(login_uri)
 	return login_uri
 }
 
 func get_token(code string) string {
+
+	//send_redirect_uri := "http://localhost:5173"
 	send_redirect_uri := redirect_uri + "/api/v1/oauth/code"
 	token_url := auth_server_url + "/o/token/"
 

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"api/pojo"
+	"api/controllers"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +9,7 @@ import (
 
 //get all
 func FindAllComment(ctx *gin.Context) {
-	commentList := pojo.FindAllComment()
+	commentList := controllers.FindAllComment()
 
 	ctx.JSON(http.StatusOK, commentList)
 
@@ -22,7 +22,7 @@ func GetCommentByTeacher(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, "")
 		return
 	}
-	comment := pojo.FindCommentByQuestion(question)
+	comment := controllers.FindCommentByQuestion(question)
 	if comment == nil {
 		ctx.JSON(http.StatusNotFound, "")
 		return
@@ -38,7 +38,7 @@ func GetCommentById(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, "")
 		return
 	}
-	comment := pojo.FindCommentById(question)
+	comment := controllers.FindCommentById(question)
 	if comment.Id == 0 {
 		ctx.JSON(http.StatusNotFound, "")
 		return
@@ -47,12 +47,8 @@ func GetCommentById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, comment)
 }
 
-
-
-
-
 // func POSTAllComment(ctx *gin.Context) {
-// 	Page := pojo.Page{}
+// 	Page := controllers.Page{}
 // 	err := ctx.BindJSON(&Page)
 // 	if err == nil {
 // 		ctx.JSON(http.StatusNotAcceptable, err)
