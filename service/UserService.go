@@ -7,14 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//get all
-func FindAllComment(ctx *gin.Context) {
-	commentList := controllers.FindAllComment()
-
-	ctx.JSON(http.StatusOK, commentList)
-
-}
-
 func GetCommentByTeacher(ctx *gin.Context) {
 
 	question := ctx.DefaultQuery("q", "")
