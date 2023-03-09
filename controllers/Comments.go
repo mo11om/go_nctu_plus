@@ -38,7 +38,7 @@ func FindCommentByTeacher(teacher string) []Comment {
 	var c []Comment
 	// var send []Comment
 
-	database.Db.Raw("SELECT  discusses.*,   teachers.name , courses.ch_name FROM  course_teacherships as ct INNER JOIN courses ON courses.id = ct.course_id		INNER JOIN discusses  ON       discusses .course_teachership_id = ct.id 		INNER JOIN teachers ON   ct.teacher_id LIKE CONCAT('[', teachers.id, ']')		where(		  teachers.name =  ?		) limit 20",
+	database.Db.Raw("SELECT  discusses.id,discusses.title,   teachers.name , courses.ch_name FROM  course_teacherships as ct INNER JOIN courses ON courses.id = ct.course_id		INNER JOIN discusses  ON       discusses .course_teachership_id = ct.id 		INNER JOIN teachers ON   ct.teacher_id LIKE CONCAT('[', teachers.id, ']')		where(		  teachers.name =  ?		)  ",
 		teacher).Scan(&c)
 
 	return c
@@ -48,7 +48,7 @@ func FindCommentByChName(ch_name string) []Comment {
 
 	var c []Comment
 	var ch_name_query string = "%" + ch_name + "%"
-	database.Db.Raw("SELECT  discusses.*,   teachers.name , courses.ch_name FROM  course_teacherships as ct INNER JOIN courses ON courses.id = ct.course_id		INNER JOIN discusses  ON       discusses .course_teachership_id = ct.id 		INNER JOIN teachers ON   ct.teacher_id LIKE CONCAT('[', teachers.id, ']')		where(courses. ch_name  like ?) limit 20",
+	database.Db.Raw("SELECT  discusses.id,discusses.title,   teachers.name , courses.ch_name FROM  course_teacherships as ct INNER JOIN courses ON courses.id = ct.course_id		INNER JOIN discusses  ON       discusses .course_teachership_id = ct.id 		INNER JOIN teachers ON   ct.teacher_id LIKE CONCAT('[', teachers.id, ']')		where(courses. ch_name  like ?)  ",
 		ch_name_query).Scan(&c)
 
 	return c
@@ -70,13 +70,14 @@ func FindAllCommentsByQuestion(question string) []Comment {
 	c_chname_ch := make(chan []Comment)
 	//c_title_ch := make(chan []Comment)
 	go func() {
-		c_teacher := FindCommentByTeacher(question)
-		c_teacher_ch <- c_teacher // send c_teacher to the channel when the function completes
-	}()
-	go func() {
 		c_chname := FindCommentByChName(question)
 		c_chname_ch <- c_chname // send c_chname to the channel when the function completes
 	}()
+	go func() {
+		c_teacher := FindCommentByTeacher(question)
+		c_teacher_ch <- c_teacher // send c_teacher to the channel when the function completes
+	}()
+
 	// go func() {
 	// 	c_title := FindCommentByTitle(question)
 	// 	c_title_ch <- c_title // send c_chname to the channel when the function completes
@@ -89,7 +90,7 @@ func FindAllCommentsByQuestion(question string) []Comment {
 	//c_title := <-c_title_ch
 	// var c_teacher []Comment = FindCommentByTeacher(question)
 	// var c_chname []Comment = FindCommentByChName(question)
-	c := (append(c_teacher, c_chname...))
+	c := (append(c_chname, c_teacher...))
 
 	//c := append(append(c_teacher, c_chname...), c_title...)
 	return c
