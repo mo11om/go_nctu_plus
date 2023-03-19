@@ -7,6 +7,36 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetCourseByID(ctx *gin.Context) {
+
+	question := ctx.DefaultQuery("id", "")
+	if question == "" {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+	comment := controllers.FindCourseByID(question)
+	if comment.Id == 0 {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, comment)
+}
+func GetCourseByTeacher(ctx *gin.Context) {
+
+	question := ctx.DefaultQuery("q", "")
+	if question == "" {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+	comment := controllers.FindCourseByTeacher(question)
+	if comment == nil {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, comment)
+}
 func GetCommentByTeacher(ctx *gin.Context) {
 
 	question := ctx.DefaultQuery("q", "")
@@ -32,6 +62,21 @@ func GetCommentById(ctx *gin.Context) {
 	}
 	comment := controllers.FindCommentById(question)
 	if comment.Id == 0 {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, comment)
+}
+func GetCommentByUserID(ctx *gin.Context) {
+
+	question := ctx.DefaultQuery("id", "")
+	if question == "" {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+	comment := controllers.FindCommentByUserId(question)
+	if len(comment) == 0 {
 		ctx.JSON(http.StatusNotFound, "")
 		return
 	}

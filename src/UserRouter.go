@@ -10,8 +10,12 @@ import (
 func AddCommentRouter(r *gin.RouterGroup) {
 	comment := r.Group("/comments")
 	//comment.GET("/all", service.FindAllComment)
+	comment.GET("/course", service.GetCourseByTeacher)
 	comment.GET("/comment", service.GetCommentById)
+	comment.GET("/add", service.GetCourseByID)
+
 	comment.GET("/serach", service.GetCommentByTeacher)
+	comment.GET("/me", service.GetCommentByUserID)
 
 	// comment.POST("/", service.POSTAllComment)
 }
