@@ -23,6 +23,7 @@ func Nycu_Oauth_Get_JWT(ctx *gin.Context) {
 
 }
 func Nycu_check_info(ctx *gin.Context) {
+	println(ctx.GetString("user_id"))
 	ctx.JSON(http.StatusOK, gin.H{
 		"student_id": ctx.GetString("student_id"),
 	})
