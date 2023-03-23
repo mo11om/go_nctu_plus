@@ -117,7 +117,10 @@ func get_Jwt(profile profileResponse) string {
 	expiresAt := time.Now().Add(10 * time.Hour).Unix()
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
+	user := findUserByStudent_Id(profile.Username)
+	fmt.Println("user_id: ", user.UserId)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id":    user.UserId,
 		"student_id": profile.Username,
 		"exp":        expiresAt,
 	})

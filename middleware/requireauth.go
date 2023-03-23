@@ -39,7 +39,9 @@ func RequireAuth(ctx *gin.Context) {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 		}
 		fmt.Println(claims["student_id"])
+		fmt.Println(claims["user_id"])
 		ctx.Set("student_id", claims["student_id"])
+		ctx.Set("user_id", claims["user_id"])
 		// not finish
 		ctx.Next()
 
