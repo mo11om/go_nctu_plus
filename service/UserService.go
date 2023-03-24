@@ -62,7 +62,7 @@ func GetCommentById(ctx *gin.Context) {
 	}
 	comment := controllers.FindCommentById(question)
 	if comment.Id == 0 {
-		ctx.JSON(http.StatusNotFound, "NOT FOUND")
+		ctx.JSON(http.StatusNotFound, "")
 		return
 	}
 
