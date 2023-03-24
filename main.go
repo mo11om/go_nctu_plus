@@ -5,8 +5,6 @@ import (
 	"api/middleware"
 	. "api/src"
 
-	_ "github.com/joho/godotenv/autoload"
-
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,20 +1,42 @@
 package service
 
 import (
-	"api/pojo"
+	"api/controllers"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-//get all
-func FindAllComment(ctx *gin.Context) {
-	commentList := pojo.FindAllComment()
+func GetCourseByID(ctx *gin.Context) {
 
-	ctx.JSON(http.StatusOK, commentList)
+	question := ctx.DefaultQuery("id", "")
+	if question == "" {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+	comment := controllers.FindCourseByID(question)
+	if comment.Id == 0 {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
 
+	ctx.JSON(http.StatusOK, comment)
 }
+func GetCourseByTeacher(ctx *gin.Context) {
 
+	question := ctx.DefaultQuery("q", "")
+	if question == "" {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+	comment := controllers.FindCourseByTeacher(question)
+	if comment == nil {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, comment)
+}
 func GetCommentByTeacher(ctx *gin.Context) {
 
 	question := ctx.DefaultQuery("q", "")
@@ -22,7 +44,7 @@ func GetCommentByTeacher(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, "")
 		return
 	}
-	comment := pojo.FindCommentByQuestion(question)
+	comment := controllers.FindCommentByQuestion(question)
 	if comment == nil {
 		ctx.JSON(http.StatusNotFound, "")
 		return
@@ -38,9 +60,9 @@ func GetCommentById(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, "")
 		return
 	}
-	comment := pojo.FindCommentById(question)
+	comment := controllers.FindCommentById(question)
 	if comment.Id == 0 {
-		ctx.JSON(http.StatusNotFound, "")
+		ctx.JSON(http.StatusNotFound, "NOT FOUND")
 		return
 	}
 
@@ -48,7 +70,7 @@ func GetCommentById(ctx *gin.Context) {
 }
 
 // func POSTAllComment(ctx *gin.Context) {
-// 	Page := pojo.Page{}
+// 	Page := controllers.Page{}
 // 	err := ctx.BindJSON(&Page)
 // 	if err == nil {
 // 		ctx.JSON(http.StatusNotAcceptable, err)

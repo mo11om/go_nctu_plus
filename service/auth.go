@@ -19,11 +19,12 @@ func Nycu_Oauth_Get_JWT(ctx *gin.Context) {
 	ctx.SetSameSite(http.SameSiteLaxMode)
 	ctx.SetCookie("Authorization", jwt_token, 3600*24, "", "", true, true)
 
-	ctx.Redirect(http.StatusPermanentRedirect, "http://localhost:8080/api/v1/oauth/me")
+	ctx.Redirect(http.StatusPermanentRedirect, "http://localhost:5173")
 
 }
 func Nycu_check_info(ctx *gin.Context) {
+	println(ctx.GetString("user_id"))
 	ctx.JSON(http.StatusOK, gin.H{
-		"login": "sucess",
+		"student_id": ctx.GetString("student_id"),
 	})
 }
