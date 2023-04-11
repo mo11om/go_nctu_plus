@@ -17,6 +17,9 @@ func AddCommentRouter(r *gin.RouterGroup) {
 	comment.GET("/search", service.GetCommentByTeacher)
 	comment.GET("/me", middleware.RequireAuth, service.GetCommentByUserId)
 
+	comment.GET("/search", service.GetCommentByQuestion)
+
+	comment.GET("/reply", service.GetReplyById)
 	// comment.POST("/", service.POSTAllComment)
 }
 

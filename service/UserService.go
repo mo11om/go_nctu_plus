@@ -39,7 +39,7 @@ func GetCourseByTeacher(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, comment)
 }
-func GetCommentByTeacher(ctx *gin.Context) {
+func GetCommentByQuestion(ctx *gin.Context) {
 
 	question := ctx.DefaultQuery("q", "")
 	if question == "" {
@@ -64,6 +64,21 @@ func GetCommentById(ctx *gin.Context) {
 	}
 	comment := controllers.FindCommentById(question)
 	if comment.Id == 0 {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, comment)
+}
+func GetReplyById(ctx *gin.Context) {
+
+	question := ctx.DefaultQuery("id", "")
+	if question == "" {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+	comment := controllers.FindreplyByCourseId(question)
+	if comment == nil {
 		ctx.JSON(http.StatusNotFound, "")
 		return
 	}
