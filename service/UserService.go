@@ -139,6 +139,39 @@ func PostNewComment(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Comment created successfully"})
 }
 
+func PATCHCommentById(ctx *gin.Context) {
+	var newComment controllers.NewComment
+	if err := ctx.ShouldBindJSON(&newComment); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	id, ok := ctx.Get("user_id")
+	if !ok {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+	var user_id string = fmt.Sprint(id)
+
+	tmp, err := strconv.Atoi(user_id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	newComment.User_id = tmp
+	fmt.Println(newComment.User_id, newComment.Course_teachership_id, newComment.Is_anonymous, newComment.Title, newComment.Content)
+
+	// Do something with the new comment, e.g. save it to a database
+	//func PatchDiscussById(user_id, id, is_anonymous int, title, content string) error {
+	err = controllers.PatchDiscussById(newComment.User_id, newComment.Course_teachership_id, newComment.Is_anonymous, newComment.Title, newComment.Content)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Comment edit successfully"})
+
+}
+
 // func POSTAllComment(ctx *gin.Context) {
 // 	Page := controllers.Page{}
 // 	err := ctx.BindJSON(&Page)

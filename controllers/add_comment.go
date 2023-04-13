@@ -11,6 +11,7 @@ type Course struct {
 
 	Name    string `gorm:"name" json "name"`
 	Ch_name string `gorm:"ch_name" json "ch_name"`
+	Content string `gorm:"content" json:"content" `
 }
 type NewComment struct {
 	User_id               int
@@ -46,7 +47,7 @@ func FindCourseByID(questions string) Course {
 func FindCommentByUserId(id string) []Comment {
 	var c []Comment
 
-	database.Db.Raw("SELECT  discusses.id,discusses.title,    teachers.name , courses.ch_name FROM  course_teacherships as ct INNER JOIN courses ON courses.id = ct.course_id		INNER JOIN discusses  ON       discusses .course_teachership_id = ct.id 		INNER JOIN teachers ON   ct.teacher_id LIKE CONCAT('[', teachers.id, ']')		where(discusses.user_id = ?)  ",
+	database.Db.Raw("SELECT  discusses.id,discusses.title,  discusses.content,  teachers.name , courses.ch_name FROM  course_teacherships as ct INNER JOIN courses ON courses.id = ct.course_id		INNER JOIN discusses  ON       discusses .course_teachership_id = ct.id 		INNER JOIN teachers ON   ct.teacher_id LIKE CONCAT('[', teachers.id, ']')		where(discusses.user_id = ?)  ",
 		id).Scan(&c)
 
 	return c
@@ -78,4 +79,28 @@ func AddCommentByCourseId(newComment NewComment) error {
 	}
 	return nil
 
+}
+func CheckUserId_is_same_to_comment(userid int, id int) error {
+	var userID int
+
+	err := database.Db.Raw("SELECT user_id FROM discusses WHERE id = ?", id).Row().Scan(&userID)
+	if err != nil {
+		return err
+	}
+	if userID != userid {
+		return fmt.Errorf("userID %d does not match user_id %d in the discusses table", userID, userid)
+	}
+	return nil
+}
+func PatchDiscussById(user_id, id, is_anonymous int, title, content string) error {
+	// Use the raw SQL statement to update the title and content columns
+
+	if err_of_userid := CheckUserId_is_same_to_comment(user_id, id); err_of_userid != nil {
+		return err_of_userid
+	}
+
+	if err := database.Db.Exec("UPDATE discusses SET title = ?,is_anonymous = ?, content = ? WHERE id = ?", title, is_anonymous, content, id).Error; err != nil {
+		return err
+	}
+	return nil
 }
