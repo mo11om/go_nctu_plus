@@ -28,6 +28,8 @@ func AddOauthrouter(r *gin.RouterGroup) {
 	oauth.GET("/login", service.Nycu_Oauth_redirect)
 	oauth.GET("/code", service.Nycu_Oauth_Get_JWT)
 	oauth.GET("/me", middleware.RequireAuth, service.Nycu_check_info)
+	oauth.GET("/logout", middleware.RequireAuth, service.Nycu_delete_info)
+
 	//oauth.POST("/token", service.Nycu_Oauth_Get_token)
 
 }
