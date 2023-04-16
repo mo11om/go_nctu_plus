@@ -160,7 +160,12 @@ func PATCHCommentById(ctx *gin.Context) {
 
 	newComment.User_id = tmp
 	fmt.Println(newComment.User_id, newComment.Course_teachership_id, newComment.Is_anonymous, newComment.Title, newComment.Content)
+	comment := controllers.FindCommentById(strconv.Itoa(newComment.Course_teachership_id))
+	fmt.Println(comment.UserId)
+	if comment.UserId != tmp {
 
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+	}
 	// Do something with the new comment, e.g. save it to a database
 	//func PatchDiscussById(user_id, id, is_anonymous int, title, content string) error {
 	err = controllers.PatchDiscussById(newComment.User_id, newComment.Course_teachership_id, newComment.Is_anonymous, newComment.Title, newComment.Content)
@@ -171,13 +176,3 @@ func PATCHCommentById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Comment edit successfully"})
 
 }
-
-// func POSTAllComment(ctx *gin.Context) {
-// 	Page := controllers.Page{}
-// 	err := ctx.BindJSON(&Page)
-// 	if err == nil {
-// 		ctx.JSON(http.StatusNotAcceptable, err)
-// 		return
-// 	}
-// 	ctx.JSON(http.StatusOK, "Page post success")
-// }
