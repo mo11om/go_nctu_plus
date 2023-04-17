@@ -113,11 +113,31 @@ func get_profile(token string) profileResponse {
 
 	return profile
 }
-func get_Jwt(profile profileResponse) string {
+
+func Check_user_exit_and_create(profile profileResponse) (NCTU_User, error) {
+	user := FindUserByStudent_Id(profile.Username)
+
+	if user.UserId == 0 {
+		err := CreateUser(profile.Username, profile.Email)
+		if err != nil {
+			return user, err
+		}
+		user := FindUserByStudent_Id(profile.Username)
+
+		return user, nil
+
+	}
+	return user, nil
+
+}
+func get_Jwt(profile profileResponse) (string, error) {
 	expiresAt := time.Now().Add(10 * time.Hour).Unix()
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
-	user := findUserByStudent_Id(profile.Username)
+	user, err := Check_user_exit_and_create(profile)
+	if err != nil {
+		return "", err
+	}
 	fmt.Println("user_id: ", user.UserId)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id":    user.UserId,
@@ -130,10 +150,10 @@ func get_Jwt(profile profileResponse) string {
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 
 	fmt.Println(tokenString, err)
-	return tokenString
+	return tokenString, nil
 }
 
-func Get_jwt_token(code string) string {
+func Get_jwt_token(code string) (string, error) {
 
 	fmt.Println("get code", code)
 
@@ -148,5 +168,5 @@ func Get_jwt_token(code string) string {
 		}
 
 	}
-	return ""
+	return "", fmt.Errorf("")
 }

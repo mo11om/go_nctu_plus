@@ -15,11 +15,21 @@ func Nycu_Oauth_redirect(ctx *gin.Context) {
 func Nycu_Oauth_Get_JWT(ctx *gin.Context) {
 
 	code := ctx.Query("code")
-	jwt_token := controllers.Get_jwt_token(code)
+	jwt_token, err := controllers.Get_jwt_token(code)
+	if err != nil {
+		ctx.Redirect(http.StatusUnauthorized, "http://localhost:5173")
+	}
 	ctx.SetSameSite(http.SameSiteLaxMode)
 	ctx.SetCookie("Authorization", jwt_token, 3600*24, "", "", true, true)
 
 	ctx.Redirect(http.StatusPermanentRedirect, "http://localhost:5173")
+
+}
+func Nycu_delete_info(ctx *gin.Context) {
+
+	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetCookie("Authorization", "", -1, "", "", true, true)
+	ctx.Redirect(http.StatusTemporaryRedirect, "http://localhost:5173")
 
 }
 func Nycu_check_info(ctx *gin.Context) {

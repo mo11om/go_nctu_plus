@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"api/controllers"
 	"fmt"
 	"net/http"
 	"os"
@@ -40,8 +41,13 @@ func RequireAuth(ctx *gin.Context) {
 		}
 		fmt.Println(claims["student_id"])
 		fmt.Println(claims["user_id"])
+
 		ctx.Set("student_id", claims["student_id"])
 		ctx.Set("user_id", claims["user_id"])
+		nctu_user := controllers.FindUserByStudent_Id(ctx.GetString("student_id"))
+		if nctu_user.UserId == 0 {
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+		}
 		// not finish
 		ctx.Next()
 
