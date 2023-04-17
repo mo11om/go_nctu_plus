@@ -42,8 +42,21 @@ func GetCourseByTeacher(ctx *gin.Context) {
 func GetCommentByQuestion(ctx *gin.Context) {
 
 	question := ctx.DefaultQuery("q", "")
-	if question == "" {
+
+	pages_query := ctx.DefaultQuery("page", "0")
+	page, err := strconv.Atoi(pages_query)
+	if err != nil {
 		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+	if question == "" {
+		comment, err := controllers.CommentLimitOffset(20, page)
+		if err != nil {
+			ctx.JSON(http.StatusNotFound, "")
+			return
+		}
+
+		ctx.JSON(http.StatusOK, comment)
 		return
 	}
 	comment := controllers.FindCommentByQuestion(question)
