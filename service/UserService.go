@@ -50,7 +50,7 @@ func GetCommentByQuestion(ctx *gin.Context) {
 		return
 	}
 	if question == "" {
-		comment, err := controllers.CommentLimitOffset(20, page)
+		comment, err := controllers.CommentLimitOffset(30, page)
 		if err != nil {
 			ctx.JSON(http.StatusNotFound, "")
 			return
@@ -90,7 +90,7 @@ func GetReplyById(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, "")
 		return
 	}
-	comment := controllers.FindreplyByCourseId(question)
+	comment := controllers.FindreplyByDiscussId(question)
 	if comment == nil {
 		ctx.JSON(http.StatusNotFound, "")
 		return
@@ -121,6 +121,22 @@ func GetCommentByUserId(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, comment)
 }
+func get_user_id(ctx *gin.Context) (int, error) {
+	id, ok := ctx.Get("user_id")
+	if !ok {
+		ctx.JSON(http.StatusNotFound, "")
+		return 0, fmt.Errorf("user_id not found")
+	}
+	var user_id string = fmt.Sprint(id)
+
+	tmp, err := strconv.Atoi(user_id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return 0, err
+	}
+	return tmp, nil
+
+}
 func PostNewComment(ctx *gin.Context) {
 
 	var newComment controllers.NewComment
@@ -128,21 +144,13 @@ func PostNewComment(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	id, ok := ctx.Get("user_id")
-	if !ok {
-		ctx.JSON(http.StatusNotFound, "")
-		return
-	}
-	var user_id string = fmt.Sprint(id)
 
-	tmp, err := strconv.Atoi(user_id)
+	id, err := get_user_id(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	newComment.User_id = tmp
-
+	newComment.User_id = id
 	fmt.Println(newComment)
 
 	controllers.AddCommentByCourseId(newComment)

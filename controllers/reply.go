@@ -15,9 +15,9 @@ type reply struct {
 	Created_at             time.Time `gorm:"created_at" json:"created_at"`
 }
 
-func FindreplyByCourseId(id string) []reply {
+func FindreplyByDiscussId(id string) []reply {
 	var c []reply
-	database.Db.Raw("select comments.* from comments	inner join discusses	ON comments. course_teachership_id = discusses.course_teachership_id	where discusses. id = ?	;	 ",
+	database.Db.Raw("select * from replys  where discuss_id =?",
 		id).Scan(&c)
 
 	return c
