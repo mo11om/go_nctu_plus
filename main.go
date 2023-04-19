@@ -3,7 +3,7 @@ package main
 import (
 	"api/database"
 	"api/middleware"
-	. "api/src"
+	"api/src"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,8 +12,8 @@ func main() {
 	router := gin.Default()
 	router.Use(middleware.Cors())
 	v1 := router.Group("api/v1")
-	AddCommentRouter(v1)
-	AddOauthrouter(v1)
+	src.AddCommentRouter(v1)
+	src.AddOauthrouter(v1)
 
 	go func() {
 		database.DBconnect()
