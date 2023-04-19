@@ -20,6 +20,8 @@ func AddCommentRouter(r *gin.RouterGroup) {
 	comment.GET("/search", service.GetCommentByQuestion)
 
 	comment.GET("/reply", service.GetReplyById)
+	comment.POST("/reply", middleware.RequireAuth, service.PostNewReply)
+
 	// comment.POST("/", service.POSTAllComment)
 }
 

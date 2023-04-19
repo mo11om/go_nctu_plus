@@ -29,8 +29,9 @@ func Nycu_delete_info(ctx *gin.Context) {
 
 	ctx.SetSameSite(http.SameSiteLaxMode)
 	ctx.SetCookie("Authorization", "", -1, "", "", true, true)
-	ctx.Redirect(http.StatusPermanentRedirect, "http://localhost:5173")
-
+	ctx.JSON(http.StatusOK, gin.H{
+		"logout": true,
+	})
 }
 func Nycu_check_info(ctx *gin.Context) {
 	println(ctx.GetString("user_id"))

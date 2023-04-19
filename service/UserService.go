@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -166,24 +167,18 @@ func PATCHCommentById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	id, ok := ctx.Get("user_id")
-	if !ok {
-		ctx.JSON(http.StatusNotFound, "")
-		return
-	}
-	var user_id string = fmt.Sprint(id)
 
-	tmp, err := strconv.Atoi(user_id)
+	id, err := get_user_id(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	newComment.User_id = tmp
+	newComment.User_id = id
 	fmt.Println(newComment.User_id, newComment.Course_teachership_id, newComment.Is_anonymous, newComment.Title, newComment.Content)
 	comment := controllers.FindCommentById(strconv.Itoa(newComment.Course_teachership_id))
 	fmt.Println(comment.UserId)
-	if comment.UserId != tmp {
+	if comment.UserId != newComment.User_id {
 
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 	}
@@ -196,4 +191,26 @@ func PATCHCommentById(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "Comment edit successfully"})
 
+}
+func PostNewReply(ctx *gin.Context) {
+
+	var reply controllers.Reply
+	if err := ctx.ShouldBindJSON(&reply); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	id, err := get_user_id(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	reply.UserId = id
+	//fmt.Println(reply)
+	//CreateReply(discussId int, userId int, content string, contentType string, createdAt time.Time, updatedAt time.Time)
+	controllers.CreateReply(reply.Id, reply.UserId, reply.Content, "1", time.Now(), time.Now())
+
+	// Do something with the new comment, e.g. save it to a database
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Reply created successfully"})
 }
