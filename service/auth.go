@@ -2,7 +2,9 @@ package service
 
 import (
 	"api/controllers"
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,22 +15,24 @@ func Nycu_Oauth_redirect(ctx *gin.Context) {
 }
 
 func Nycu_Oauth_Get_JWT(ctx *gin.Context) {
-
+	front_end_uri := os.Getenv("front_end_uri")
+	fmt.Println(front_end_uri)
 	code := ctx.Query("code")
+
 	jwt_token, err := controllers.Get_jwt_token(code)
 	if err != nil {
-		ctx.Redirect(http.StatusUnauthorized, "http://localhost:5173")
+		ctx.Redirect(http.StatusUnauthorized, front_end_uri)
 	}
 	ctx.SetSameSite(http.SameSiteLaxMode)
-	ctx.SetCookie("Authorization", jwt_token, 3600*24, "", "", true, true)
+	ctx.SetCookie("Authorization", jwt_token, 3600*24, "/", "", false, true)
 
-	ctx.Redirect(http.StatusPermanentRedirect, "http://localhost:5173")
+	ctx.Redirect(http.StatusPermanentRedirect, front_end_uri)
 
 }
 func Nycu_delete_info(ctx *gin.Context) {
 
 	ctx.SetSameSite(http.SameSiteLaxMode)
-	ctx.SetCookie("Authorization", "", -1, "", "", true, true)
+	ctx.SetCookie("Authorization", "", -1, "", "", false, true)
 	ctx.JSON(http.StatusOK, gin.H{
 		"logout": true,
 	})

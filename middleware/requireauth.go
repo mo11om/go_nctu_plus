@@ -12,9 +12,10 @@ import (
 )
 
 func RequireAuth(ctx *gin.Context) {
-	fmt.Println("in middleware")
+
 	tokenString, err := ctx.Cookie("Authorization")
-	if err != nil {
+	fmt.Println("tokenString", tokenString)
+	if err != nil || len(tokenString) < 20 {
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

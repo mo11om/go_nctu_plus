@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	gin.SetMode(gin.DebugMode)
 	router := gin.Default()
 	router.Use(middleware.Cors())
 	v1 := router.Group("api/v1")
@@ -18,5 +19,5 @@ func main() {
 	go func() {
 		database.DBconnect()
 	}()
-	router.Run("localhost:8080")
+	router.Run(":8080")
 }
