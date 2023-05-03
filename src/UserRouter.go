@@ -10,17 +10,20 @@ import (
 func AddCommentRouter(r *gin.RouterGroup) {
 	comment := r.Group("/comments")
 	//comment.GET("/all", service.FindAllComment)
-	comment.GET("/course", service.GetCourseByTeacher)
-	comment.GET("/comment", service.GetCommentById)
-
-	comment.POST("/me", middleware.RequireAuth, service.PostNewComment)
+	comment.GET("/course", service.GetCourseByQuestion)
 
 	comment.GET("/me", middleware.RequireAuth, service.GetCommentByUserId)
+	comment.POST("/me", middleware.RequireAuth, service.PostNewComment)
 	comment.PATCH("/me", middleware.RequireAuth, service.PATCHCommentById)
+	comment.DELETE("/me", middleware.RequireAuth, service.DeleteCommentById)
+
 	comment.GET("/search", service.GetCommentByQuestion)
+	comment.GET("/comment", service.GetCommentById)
 
 	comment.GET("/reply", service.GetReplyById)
 	comment.POST("/reply", middleware.RequireAuth, service.PostNewReply)
+	comment.PATCH("/reply", middleware.RequireAuth, service.UpadteReply)
+	comment.DELETE("/reply", middleware.RequireAuth, service.DeleteReplyById)
 
 	// comment.POST("/", service.POSTAllComment)
 }

@@ -40,6 +40,21 @@ func GetCourseByTeacher(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, comment)
 }
+func GetCourseByQuestion(ctx *gin.Context) {
+
+	question := ctx.DefaultQuery("q", "")
+	if question == "" {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+	comment := controllers.FindCourseByQuestion(question)
+	if comment == nil {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, comment)
+}
 func GetCommentByQuestion(ctx *gin.Context) {
 
 	question := ctx.DefaultQuery("q", "")
@@ -152,7 +167,11 @@ func PostNewComment(ctx *gin.Context) {
 		return
 	}
 	newComment.User_id = id
-	fmt.Println(newComment)
+	// fmt.Println(newComment.User_id,
+	// 	newComment.Course_teachership_id,
+	// 	newComment.Title,
+
+	// 	newComment.Is_anonymous)
 
 	controllers.AddCommentByCourseId(newComment)
 
@@ -164,53 +183,136 @@ func PostNewComment(ctx *gin.Context) {
 func PATCHCommentById(ctx *gin.Context) {
 	var newComment controllers.NewComment
 	if err := ctx.ShouldBindJSON(&newComment); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.Status(http.StatusBadRequest)
 		return
 	}
 
 	id, err := get_user_id(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.Status(http.StatusBadRequest)
 		return
 	}
 
 	newComment.User_id = id
-	fmt.Println(newComment.User_id, newComment.Course_teachership_id, newComment.Is_anonymous, newComment.Title, newComment.Content)
-	comment := controllers.FindCommentById(strconv.Itoa(newComment.Course_teachership_id))
-	fmt.Println(comment.UserId)
-	if comment.UserId != newComment.User_id {
+	fmt.Println(newComment.User_id, newComment.Course_teachership_id, newComment.Is_anonymous, newComment.Title)
 
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-	}
 	// Do something with the new comment, e.g. save it to a database
 	//func PatchDiscussById(user_id, id, is_anonymous int, title, content string) error {
 	err = controllers.PatchDiscussById(newComment.User_id, newComment.Course_teachership_id, newComment.Is_anonymous, newComment.Title, newComment.Content)
 	if err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	ctx.Status(http.StatusOK)
+
+}
+func DeleteCommentById(ctx *gin.Context) {
+	query := ctx.DefaultQuery("id", "")
+	if query == "" {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+	comment_id, err := strconv.Atoi(query)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Comment edit successfully"})
+	user_id, err := get_user_id(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = controllers.CheckUserId_is_same_to_comment(user_id, comment_id)
+	if err != nil {
+		ctx.Status(http.StatusUnauthorized)
+		return
+	}
+	// Do something with the new comment, e.g. save it to a database
+	//func PatchDiscussById(user_id, id, is_anonymous int, title, content string) error {
+	err = controllers.DeleteDiscussById(comment_id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.Status(http.StatusOK)
 
 }
 func PostNewReply(ctx *gin.Context) {
 
 	var reply controllers.Reply
 	if err := ctx.ShouldBindJSON(&reply); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.Status(http.StatusBadRequest)
 		return
 	}
 
 	id, err := get_user_id(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.Status(http.StatusBadRequest)
 		return
 	}
 	reply.UserId = id
 	//fmt.Println(reply)
 	//CreateReply(discussId int, userId int, content string, contentType string, createdAt time.Time, updatedAt time.Time)
-	controllers.CreateReply(reply.Id, reply.UserId, reply.Content, "1", time.Now(), time.Now())
-
+	err = controllers.CreateReply(reply.Id, reply.UserId, reply.Content, "1", time.Now(), time.Now())
+	if err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
 	// Do something with the new comment, e.g. save it to a database
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Reply created successfully"})
+	ctx.Status(http.StatusOK)
+}
+func UpadteReply(ctx *gin.Context) {
+
+	var reply controllers.Reply
+	if err := ctx.ShouldBindJSON(&reply); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+
+	id, err := get_user_id(ctx)
+	if err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	reply.UserId = id
+	fmt.Println(reply)
+
+	err = controllers.UpdateReply(reply.Id, reply.UserId, reply.Content)
+	if err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	// Do something with the new comment, e.g. save it to a database
+
+	ctx.Status(http.StatusOK)
+}
+
+func DeleteReplyById(ctx *gin.Context) {
+
+	query := ctx.DefaultQuery("id", "")
+	if query == "" {
+		ctx.JSON(http.StatusNotFound, "")
+		return
+	}
+	reply_id, err := strconv.Atoi(query)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	user_id, err := get_user_id(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	//fmt.Println(reply)
+	//CreateReply(discussId int, userId int, content string, contentType string, createdAt time.Time, updatedAt time.Time)
+	err = controllers.DeleteReply(reply_id, user_id)
+	if err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+
 }

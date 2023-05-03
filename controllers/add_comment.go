@@ -14,7 +14,7 @@ type Course struct {
 	Content string `gorm:"content" json:"content" `
 }
 type NewComment struct {
-	User_id               int
+	User_id               int    `json:"user_id"`
 	Course_teachership_id int    `json:"id"`
 	Title                 string `json:"title"`
 	Content               string `json:"content"`
@@ -33,6 +33,20 @@ func FindCourseByTeacher(questions string) []Course {
 	var query string = "%" + questions + "%"
 	database.Db.Raw("SELECT   teachers.name , courses.ch_name  ,ct.id	FROM course_teacherships as ct	 INNER JOIN courses ON courses.id = ct.course_id			  INNER JOIN teachers ON   ct.teacher_id LIKE CONCAT('[', teachers.id, ']')		 where(teachers.name like ?) 	limit 20",
 		query).Scan(&c)
+
+	return c
+}
+func FindCourseByQuestion(questions string) []Course {
+	var c []Course
+	var query string = "%" + questions + "%"
+	sql_query := `SELECT   teachers.name , courses.ch_name  ,ct.id	
+	FROM course_teacherships as ct	 
+	INNER JOIN courses ON courses.id = ct.course_id			
+	INNER JOIN teachers ON   ct.teacher_id = CONCAT('[', teachers.id, ']')		 
+	where(teachers.name like ?) or 	(courses.ch_name  like  ?)
+	limit 50
+	`
+	database.Db.Raw(sql_query, query, query).Scan(&c)
 
 	return c
 }
@@ -87,20 +101,37 @@ func CheckUserId_is_same_to_comment(userid int, id int) error {
 	if err != nil {
 		return err
 	}
-	if userID != userid {
-		return fmt.Errorf("userID %d does not match user_id %d in the discusses table", userID, userid)
+	if userID == userid {
+		return nil
 	}
-	return nil
+
+	return fmt.Errorf("userID %d does not match user_id %d in the discusses table", userID, userid)
+
 }
 func PatchDiscussById(user_id, id, is_anonymous int, title, content string) error {
 	// Use the raw SQL statement to update the title and content columns
-
+	time_string := get_time()
 	if err_of_userid := CheckUserId_is_same_to_comment(user_id, id); err_of_userid != nil {
 		return err_of_userid
 	}
 
-	if err := database.Db.Exec("UPDATE discusses SET title = ?,is_anonymous = ?, content = ? WHERE id = ?", title, is_anonymous, content, id).Error; err != nil {
+	if err := database.Db.Exec("UPDATE discusses SET title = ?,is_anonymous = ?, content = ?  ,updated_at=? WHERE id = ? ", title, is_anonymous, content, time_string, id).Error; err != nil {
 		return err
 	}
+	return nil
+}
+
+func DeleteDiscussById(id int) error {
+
+	// Delete the discuss by id
+	if err := database.Db.Exec("DELETE FROM discusses WHERE id = ?", id).Error; err != nil {
+		return err
+	}
+
+	// Also delete all replies associated with the discuss
+	if err := database.Db.Exec("DELETE FROM replys WHERE discuss_id = ?", id).Error; err != nil {
+		return err
+	}
+
 	return nil
 }

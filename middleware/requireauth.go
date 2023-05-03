@@ -45,6 +45,7 @@ func RequireAuth(ctx *gin.Context) {
 
 		ctx.Set("student_id", claims["student_id"])
 		ctx.Set("user_id", claims["user_id"])
+		fmt.Println("middle userid", ctx.GetString("user_id"))
 		nctu_user := controllers.FindUserByStudent_Id(ctx.GetString("student_id"))
 		if nctu_user.UserId == 0 {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
