@@ -3,6 +3,7 @@ package controllers
 import (
 	"api/database"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"time"
 )
@@ -26,6 +27,15 @@ func FindUserByStudent_Id(student_id string) NCTU_User {
 	return user
 }
 
+func FindUserById(id string) NCTU_User {
+	var user NCTU_User
+	// var send []Comment
+
+	database.Db.Raw("select * from  users where (   id =? )  ",
+		id).Scan(&user)
+	fmt.Println(user)
+	return user
+}
 func createAuthUser(userID, studentID, email string) error {
 	now := get_time()
 
@@ -40,15 +50,29 @@ func createAuthUser(userID, studentID, email string) error {
 	fmt.Println(" create auth users success")
 	return nil
 }
-func CreateUser(name, email string) error {
+func ramdom_createAuthUser(n int) string {
+
+	rand.Seed(time.Now().UnixNano())
+
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789")
+
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+
+}
+func CreateUser(user_id, email string) error {
 	query := `
-        INSERT INTO users (  created_at, name, email)
-        VALUES (  ?, ?, ?)
+        INSERT INTO users (  created_at,updated_at, name, email)
+        VALUES (  ?, ?, ?,?)
     `
 	var id int
 
 	createdAt := get_time()
-	err := database.Db.Exec(query, createdAt, name, email).Error
+	user_name := ramdom_createAuthUser(10)
+	err := database.Db.Exec(query, createdAt, createdAt, user_name, email).Error
 	if err != nil {
 		return err
 	}
@@ -57,6 +81,27 @@ func CreateUser(name, email string) error {
 	fmt.Println(" find users success")
 	userID := strconv.Itoa(id)
 
-	createAuthUser(userID, name, email)
+	createAuthUser(userID, user_id, email)
 	return nil
+}
+func check_name_exists(name string) bool {
+	var id int
+	query := "SELECT id FROM users WHERE name = ? LIMIT 1"
+	database.Db.Raw(query, name).Scan(&id)
+
+	return id != 0 // record not found, name doesn't exist
+
+}
+
+func UpdateUserName(userId int, name string) error {
+	print("upadate user id", userId, name)
+	if check_name_exists(name) {
+		return fmt.Errorf("name already exists")
+	}
+	query := `	update  users
+				set name = ? 				
+				WHERE id =?     
+			  `
+	err := database.Db.Exec(query, name, userId).Error
+	return err
 }

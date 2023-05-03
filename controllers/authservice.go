@@ -168,5 +168,5 @@ func Get_jwt_token(code string) (string, error) {
 		}
 
 	}
-	return "", fmt.Errorf("")
+	return "", fmt.Errorf("no token found")
 }

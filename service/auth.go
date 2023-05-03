@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,10 +47,39 @@ func Nycu_delete_info(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 func Nycu_check_info(ctx *gin.Context) {
+
+	ctx.Status(http.StatusOK)
+}
+func NYCU_update_info(ctx *gin.Context) {
+	var user controllers.NCTU_User
+	if err := ctx.ShouldBindJSON(&user); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+	id, err := get_user_id(ctx)
+
+	if err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("upadate user id", id)
+	if err := controllers.UpdateUserName(id, user.Name); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"reeason": "name is duplicate"})
+		return
+	}
+	ctx.Status(http.StatusOK)
+
+}
+func Nycu_give_info(ctx *gin.Context) {
+
 	println("id", ctx.GetString("user_id"))
 	user_id, _ := get_user_id(ctx)
+	user := controllers.FindUserById(strconv.Itoa(user_id))
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"student_id": ctx.GetString("student_id"),
 		"user_id":    user_id,
+		"name":       user.Name,
 	})
 }
