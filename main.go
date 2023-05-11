@@ -4,12 +4,13 @@ import (
 	"api/database"
 	"api/middleware"
 	"api/src"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	gin.SetMode(gin.DebugMode)
+	gin.SetMode(os.Getenv("GIN_MODE"))
 	router := gin.Default()
 	router.Use(middleware.Cors())
 	v1 := router.Group("api/v1")
