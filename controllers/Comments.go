@@ -115,6 +115,8 @@ func FindCommentByQuestion(question string) []Comment {
 		where(courses. ch_name  like ? )
 		or  ( teachers.name like ?  ) 
 		or discusses.title like ? 
+		
+
 	`
 	database.Db.Raw(query,
 		title_query, title_query, title_query).Scan(&c)
@@ -143,7 +145,8 @@ func CommentLimitOffset(limit, page int) ([]Comment, error) {
 	INNER JOIN courses ON courses.id = ct.course_id
 	INNER JOIN discusses ON discusses.course_teachership_id = ct.id
 	INNER JOIN teachers ON ct.teacher_id = CONCAT('[', teachers.id, ']')
-	 
+	
+	order by discusses.id desc
 	LIMIT ? OFFSET ?
 `
 	err := database.Db.Raw(query, limit, page*limit).Scan(&c).Error
