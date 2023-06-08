@@ -23,14 +23,14 @@ func Nycu_Oauth_Get_JWT(ctx *gin.Context) {
 	fmt.Println("error_of_oauth", error_of_oauth)
 	if error_of_oauth != "" {
 		fmt.Println("error")
-		ctx.Redirect(http.StatusUnauthorized, front_end_uri)
+		ctx.Redirect(http.StatusTemporaryRedirect, front_end_uri)
 		return
 	}
 
 	jwt_token, err := controllers.Get_jwt_token(code)
 
 	if err != nil {
-		ctx.Redirect(http.StatusUnauthorized, front_end_uri)
+		ctx.Redirect(http.StatusTemporaryRedirect, front_end_uri)
 		return
 	}
 	ctx.SetSameSite(http.SameSiteLaxMode)
